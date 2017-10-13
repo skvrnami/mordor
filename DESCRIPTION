@@ -18,7 +18,7 @@ Suggests:
     lintr,
     knitr,
     rmarkdown, 
-    roxygen2
+    roxygen2,
     ggplot2
 License: GPL-3
 Encoding: UTF-8
