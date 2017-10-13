@@ -3,5 +3,6 @@ inst/doc
 .Rbuildignore
 .Rhistory
 .Rproj.user/
+.Rproj
 
 
