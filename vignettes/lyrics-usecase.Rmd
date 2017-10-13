@@ -1,0 +1,232 @@
+---
+title: "Morphoditar package use case: Analysis of lyrics"
+author: "Michael Škvrňák <michael.skvrnak@rozhlas.cz>"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+## Introduction
+
+This vignette demonstrates functions contained in the *morphoditar* R package which 
+accesses the [MorphoDiTa](http://lindat.mff.cuni.cz/services/morphodita/run.php) 
+(Morphological Dictionary and Tagger) API developed by Institute of Formal and Applied
+Linguistics, Faculty of Mathematics and Physics, Charles University in Prague.
+
+The demonstration is performed using lyrics of a non-random selection of Czech bands 
+from the local do-it-yourself scene with genres ranging from hardcore-punk to indie pop[^1]. 
+In particular, it includes the bands:  
+
+* [Dukla](http://dukla.bandcamp.com/),  
+* [Esazlesa](https://esazlesa.bandcamp.com/),  
+* [Gattaca](https://gattaca.bandcamp.com/),  
+* [±0](https://plusminusnula.bandcamp.com/),  
+* [Remek](https://remekdiy.bandcamp.com/), and  
+* [Role](https://rolerolerole.bandcamp.com/)
+
+Please note that MorphoDiTa is available for non-commercial purposes only.
+
+## Motivation
+
+Research on psychology of language indicate that the choice of words is associated with
+psychological state of authors. For instance, according to [Tausczik and Pennebaker (2010)](http://journals.sagepub.com/doi/abs/10.1177/0261927X09351676?journalCode=jlsa): 
+*People who are experiencing physical or emotional pain tend to have their attention drawn* 
+*to themselves and subsequently use more first-person singular pronouns*. 
+
+Also, *"Pronouns and verb tense are useful linguistic elements that can help identify focus,*
+*which, in turn, can show priorities, intentions, and processing. Some care should be *
+*taken in evaluating how pronouns and verbs are used. An exception to the pronoun-*
+*attention rule concerns first-person plural pronouns—“we,” “us,” and “our.” Sometimes *
+*“we” can signal a sense of group identity, such as when couples are asked to evaluate *
+*their marriages to an interviewer, the more the participants use “we,” the better their *
+*marriage"*
+
+Thus, it does not seem to be an overstretch to assume that music bands playing different
+genres will use pronouns in different frequencies as their lyrics should focus on different
+priorities. 
+
+To quote, a hardcore punk band not included in the analysis [Antisocial Skills](https://antisocialskills.bandcamp.com/releases), 
+in particular their song Different frequencies:  
+  
+*We just we have different priorities*  
+*We work on different frequencies*  
+
+In general, we could assume that the attention which bands playing music of different genres
+differs in respect to what they perceive as the thing that sucks. To put it bluntly, 
+indie pop bands tend to sing songs like *"you don't love me and it sucks"*, 
+in contrast to hardcore punk bands which tend to focus on flaws of 
+*"the society/consumerism/capitalism which sucks"*. 
+
+Based on this, we can formulate tentative hypotheses like:  
+
+* Indie pop/something bands use first-person and second-person singular pronouns more often than hardcore bands.
+* Hardcore bands use first-person and third-person plural pronouns more often than indie pop/something bands.
+
+
+## Analysis
+
+(If you don't care about the programming stuff, scroll down to colourful charts).
+
+### Processing the data
+Let's start with loading the data. They are already stored in the package, 
+so we need to call the `data` function.
+```{r}
+devtools::load_all(".")
+library(morphoditar)
+library(dplyr)
+library(ggplot2)
+
+data("dukla")
+data("esazlesa")
+data("gattaca")
+data("plusminusnula")
+data("remek")
+data("role")
+
+str(dukla)
+```
+
+### morphoditaR functions
+
+Before continuing, let's clarify what functions are defined in the package. 
+
+During processing of the data, the first function needed is the `tag_morphodita` 
+function which send requests to the API and returns data (tagged words). 
+More specifically, it returns S3 object with attributes specifying the request 
+(URL, model, tagset, and language) and data.frame with the output from the API.
+
+```{r}
+out <- tag_morphodita("To je život")
+str(out)
+out
+```
+
+Clearly, the API does not return tags in a form which would enable to work with them
+easily. Therefore, another function splits the tags into separate columns.  
+In the case of Czech language models, the tags can be separated into categories specified
+[in this document](https://ufal.mff.cuni.cz/pdt/Morphology_and_Tagging/Doc/hmptagqr.html), 
+and in the case of English language model, the tags are specified [here](https://ling.upenn.edu/courses/Fall_2003/ling001/penn_treebank_pos.html).
+
+```{r}
+out1 <- out %>% split_tags
+out1$output
+```
+
+The categories, however, are not very comprehensible and consulting the categories
+with the documents mentioned above is not user-friendly. Thus, there is `recode_tags`
+function which gives the tags proper labels.
+
+```{r}
+out2 <- out1 %>% recode_tags
+out2$output
+```
+
+We can continue in the analysis by defining helper functions which tag the lyrics 
+and split the returned tags into columns and recode them using the functions mentioned above.
+Also, we need to define function that will create a dataset containing the tagged lyrics
+together with data on the band, album, and song the lyrics come from.
+
+```{r}
+# Define helper functions
+
+## Tag lyrics
+tag_data <- function(df){
+    lapply(df$lyrics, function(x) x %>% tag_morphodita %>% split_tags %>% recode_tags)
+}
+
+## Add metadata to the tagged output
+add_metadata <- function(output, source_lyrics, band){
+    for (i in seq_len(length(output))){
+        output[[i]]$output$song <- source_lyrics$song[i]
+        output[[i]]$output$album <- source_lyrics$album[i]
+        output[[i]]$output$band <- band
+    }
+    
+    do.call(rbind, lapply(output, function(x) x[["output"]]))
+}
+
+```
+
+Then, we process all of the datasets with lyrics and merge them together into single
+dataset.
+```{r}
+
+dukla_lyrics <- add_metadata(tag_data(dukla), dukla, "Dukla")
+esazlesa_lyrics <- add_metadata(tag_data(esazlesa), esazlesa, "Esazlesa")
+gattaca_lyrics <- add_metadata(tag_data(gattaca), gattaca, "Gattaca")
+plusminusnula_lyrics <- add_metadata(tag_data(plusminusnula), plusminusnula, "±0")
+remek_lyrics <- add_metadata(tag_data(remek), remek, "Remek")
+role_lyrics <- add_metadata(tag_data(role), role, "Role")
+
+all_lyrics <- do.call(rbind, lapply(apropos("_lyrics"), get))
+all_lyrics$genre <- ifelse(all_lyrics$band %in% c("Esazlesa", "Gattaca", "Remek"), 
+                           "hardcore", "indie something")
+```
+
+The resulting dataset looks like this:
+```{r}
+str(all_lyrics)
+```
+
+#### Personal pronouns
+Then we can focus on personal pronouns (já, ty, on/ona/ono, my, vy, oni/ony) contained
+in the lyrics.
+```{r}
+personal_pronouns <- subset(all_lyrics, SUBPOS == "Personal pronoun, clitical (short) form" | 
+                                        SUBPOS == "Personal pronoun")
+personal_pronouns$type <- paste(personal_pronouns$NUMBER, personal_pronouns$PERSON)
+
+pronouns_sum <- personal_pronouns %>% group_by(type, band, genre) %>% summarise(length = n())
+```
+
+```{r fig.width=7, fig.height=5}
+ggplot(pronouns_sum, aes(x = band, y = length, fill = type)) + 
+    geom_bar(stat = "identity") + facet_grid(. ~ genre, scales = "free") + 
+    labs(title = "Personal pronouns", y = "frequency of pronouns")
+```
+
+#### Possessive pronouns
+```{r}
+possessive_pronouns <- subset(all_lyrics, 
+                              SUBPOS == "Possessive pronoun 'můj', 'tvůj', 'jeho/její'")
+possessive_pronouns$type <- paste(possessive_pronouns$POSNUMBER, possessive_pronouns$PERSON)
+
+possessive_sum <- possessive_pronouns %>% group_by(type, band, genre) %>% summarise(length = n())
+
+```
+
+```{r fig.width=7, fig.height=5}
+ggplot(possessive_sum, aes(x = band, y = length, fill = type)) + 
+    geom_bar(stat = "identity") + facet_grid(. ~ genre, scales = "free") + 
+    labs(title = "Possessive pronouns", y = "frequency of pronouns")
+```
+
+## Interpretation
+
+So the distinction between the genres is not that clear-cut as one could expect. 
+The most common personal pronoun is first-person singular for all bands except for Esazlesa
+which use second-person singular more often. Their use of second-person singular also 
+present a deviation from the hypothesis. 
+
+We can explain this deviation by the fact that the underlying mechanism which should drive
+the selection of personal pronouns does not always hold. Hardcore bands are not predestined
+to write about despair caused by modern societies, but they can also sing about failures within
+inter-personal relationships as they do in [For Better or Worse/V dobrém i ve zlém](https://esazlesa.bandcamp.com/track/v-dobr-m-i-zl-m) 
+which is about failed marriage.  
+In addition, some of their lyrics are not available on Bandcamp, such as the lyrics of 
+[Middle Children of History/Průměrný děti historie](https://esazlesa.bandcamp.com/track/pr-m-rn-d-ti-historie) where they quote 
+Palahniuk's Fight Club/Tyler Durden:  
+*"Advertising has __us__ chasing cars and clothes, working jobs __we__ hate so __we__ can buy shit __we__ don’t need. __We’re__ the middle children of history, man. No purpose or place. __We__ have no Great War. No Great Depression. __Our__ Great War’s a spiritual war… __our__ Great Depression is __our__ lives."*  
+(Although, the English translation contain much more personal pronouns than the Czech translation.
+Therefore, exploring the conjugation of verbs might be another possible approach how to 
+investigate the difference between genres/authors.)
+
+Apart from that, the use of plural pronouns merely supports the hypothesis. 
+
+If you miss statistical tests, you can use *"perverse language of statistics and numbers"* ([Gattaca: Workfare](https://gattaca.bandcamp.com/track/workfare-workfare-2)) to compute 
+them yourself. DIY, d'oh. 
+
+[^1]: More specifically, the selection was based on the author's perception that the bands don't suck and they have lyrics on bandcamp so that it could be scraped. 
