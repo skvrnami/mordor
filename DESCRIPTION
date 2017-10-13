@@ -12,7 +12,8 @@ Imports:
     tidyr, 
     car, 
     magrittr, 
-    purrr
+    purrr,
+    roxygen2
 Suggests:
     testthat, 
     lintr,
