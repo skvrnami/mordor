@@ -7,6 +7,7 @@
 #' (pdt_to_conll2009 / strip_lemma_comment / strip_lemma_id)
 #' @param ... Other parameters accepted by the API (see the API reference)
 #' @seealso http://lindat.mff.cuni.cz/services/morphodita/api-reference.php
+#' @export
 tag_morphodita <- function(data, convert_tagset = "pdt_to_conll2009", ...){
     tagset <- convert_tagset
     out <- httr::GET(
@@ -36,7 +37,7 @@ tag_morphodita <- function(data, convert_tagset = "pdt_to_conll2009", ...){
 }
 
 
-
+#' @export
 print.morphodita_api <- function(x, ...){
     cat("MorphoDiTa API call:\n\n")
     cat("Tagset:", x$tagset, "\n")
@@ -54,6 +55,7 @@ print.morphodita_api <- function(x, ...){
 #' @param data dataset which is returned by the tag_morphodita function
 #' @seealso https://ufal.mff.cuni.cz/pdt/Morphology_and_Tagging/Doc/hmptagqr.html
 #' @seealso https://ling.upenn.edu/courses/Fall_2003/ling001/penn_treebank_pos.html
+#' @export
 split_tags <- function(data){
     out <- data$output
     if (data$tagset == "pdt_to_conll2009"){
@@ -128,10 +130,12 @@ split_tags <- function(data){
 #' @param data data.frame in which the lemmas with tags are stored
 #' @seealso https://ufal.mff.cuni.cz/pdt/Morphology_and_Tagging/Doc/hmptagqr.html
 #' @import magrittr
+#' @export
 recode_tags <- function(data){
     out <- data$output
     if (data$lang == "cz" | data$tagset == "pdt_to_conll2009"){
         data("TAGS")
+        TAGS <- TAGS
         out$POS %<>% factor(levels = TAGS$POS$Value,
                             labels = TAGS$POS$Description)
         out$SUBPOS %<>%
@@ -176,6 +180,7 @@ recode_tags <- function(data){
         )
     }else{
         data("TAGS_EN")
+        TAGS_EN <- TAGS_EN
         out$tag %<>% factor(levels = TAGS_EN$Value,
                             labels = TAGS_EN$Description)
     }

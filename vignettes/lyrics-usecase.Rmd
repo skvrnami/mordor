@@ -74,7 +74,8 @@ Based on this, we can formulate tentative hypotheses like:
 Let's start with loading the data. They are already stored in the package, 
 so we need to call the `data` function.
 ```{r}
-devtools::load_all(".")
+library(devtools)
+devtools::install_github("skvrnami/morphoditar")
 library(morphoditar)
 library(dplyr)
 library(ggplot2)

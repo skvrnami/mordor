@@ -6,6 +6,7 @@
 #' (pdt_to_conll2009 / strip_lemma_comment / strip_lemma_id)
 #' @param ... Other parameters accepted by API
 #' @seealso http://lindat.mff.cuni.cz/services/morphodita/api-reference.php
+#' @export
 gen_morphodita <- function(data,
                            convert_tagset = "strip_lemma_id", ...){
 
