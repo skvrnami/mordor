@@ -18,10 +18,14 @@ For more information see:
 devtools::install_github("skvrnami/morphoditar")
 ```
 
+## Usage
+
+A basic overview of the package capabilities provides a toy example of Czech (more-or-less) DIY bands which is available [here](http://skvrnami.github.io/morphoditar/lyrics-usecase.html).
+
 ### To DO:
 
-- [x] Load tag codes from files (remove hardcoding).
-- [x] Tag Var s pomlčkou
+- [x] Load tag codes from files (remove hardcoding)
+- [x] Properly recode Tag Var value of dash
 - [ ] Check Slovak model
 - [ ] Handle NA values when tagging (sending to API)
 - [ ] Compatibility with quanteda
