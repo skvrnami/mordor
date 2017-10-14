@@ -1,6 +1,7 @@
 # MorphoDiTaR - R client for MorphoDiTa API
 
 [![Travis-CI Build Status](https://travis-ci.org/skvrnami/morphoditar.svg?branch=master)](https://travis-ci.org/skvrnami/morphoditar)
+[![codecov](https://codecov.io/gh/skvrnami/morphoditar/branch/master/graph/badge.svg)](https://codecov.io/gh/skvrnami/morphoditar)
 
 This package serves as a R client for MorphoDiTa API, 
 Morphological Dictionary and Tagger - an open-source 
