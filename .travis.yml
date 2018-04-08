@@ -1,9 +1,16 @@
 # R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
+sudo: required
 
 language: R
-sudo: false
 cache: packages
 warnings_are_errors: false
+
+services:
+  - docker
+
+before_install:
+  - docker pull skvrnami/mordor-docker
+  - docker run -p 4000:80 mordor-docker
 
 r_packages:
   - covr

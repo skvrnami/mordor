@@ -1,4 +1,4 @@
-Package: morphoditar
+Package: mordor
 Type: Package
 Title: R interface to MorphoDiTa
 Version: 0.1.0

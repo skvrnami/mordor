@@ -1,15 +1,25 @@
 context("Tag API Test")
 
 context("Test tagging")
-test_that("API tag output", {
-    expect_equal(nrow(tag_morphodita("A je to")$output),
+system("docker pull skvrnami/mordor-docker:latest")
+system("docker run -p 4000:80 skvrnami/mordor-docker:latest")
+test_that("API tag output (docker)", {
+    expect_equal(nrow(tag_morphodita("A je to", source = "docker")$output),
                  length(unlist(strsplit("A je to", split = " "))))
-    expect_equal(ncol(tag_morphodita("A je to")$output),
+    expect_equal(ncol(tag_morphodita("A je to", source = "docker")$output),
                  3)
-    expect_equal(colnames(tag_morphodita("A je to")$output),
+    expect_equal(colnames(tag_morphodita("A je to", source = "docker")$output),
                  c("token", "lemma", "tag"))
 })
 
+test_that("API tag output (lindat)", {
+    expect_equal(nrow(tag_morphodita("A je to", source = "docker")$output),
+                 length(unlist(strsplit("A je to", split = " "))))
+    expect_equal(ncol(tag_morphodita("A je to", source = "docker")$output),
+                 3)
+    expect_equal(colnames(tag_morphodita("A je to", source = "docker")$output),
+                 c("token", "lemma", "tag"))
+})
 
 context("Test generation")
 get_salutation <- function(data){
