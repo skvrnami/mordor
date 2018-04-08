@@ -10,8 +10,7 @@ services:
 
 before_install:
   - docker pull skvrnami/mordor-docker
-  - docker ps
-  - docker run -p 4000:80 skvrnami/mordor-docker
+  - docker run -d -p 4000:80 skvrnami/mordor-docker
 
 r_packages:
   - covr
