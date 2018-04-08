@@ -12,7 +12,8 @@ Imports:
     tidyr, 
     car, 
     magrittr, 
-    purrr
+    purrr,
+    rvest
 Suggests:
     devtools,
     testthat, 
