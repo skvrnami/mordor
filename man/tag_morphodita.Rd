@@ -4,13 +4,15 @@
 \alias{tag_morphodita}
 \title{Perform morphological analysis of supplied text}
 \usage{
-tag_morphodita(data, convert_tagset = "pdt_to_conll2009", ...)
+tag_morphodita(data, tagset = "pdt_to_conll2009", source = "docker", ...)
 }
 \arguments{
 \item{data}{Text to be analysed}
 
-\item{convert_tagset}{Apply specified tag set converter
+\item{tagset}{Apply specified tag set converter
 (pdt_to_conll2009 / strip_lemma_comment / strip_lemma_id)}
+
+\item{source}{use "docker" or "lindat" for API}
 
 \item{...}{Other parameters accepted by the API (see the API reference)}
 }

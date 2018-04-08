@@ -3,9 +3,9 @@
 #'
 #' Function that send to and get requests from MorphoDiTa API call.
 #' @param data Text to be analysed
-#' @param convert_tagset Apply specified tag set converter
+#' @param tagset Apply specified tag set converter
 #' (pdt_to_conll2009 / strip_lemma_comment / strip_lemma_id)
-#' @param source use docker or lindat for API
+#' @param source use "docker" or "lindat" for API
 #' @param ... Other parameters accepted by the API (see the API reference)
 #' @seealso http://lindat.mff.cuni.cz/services/morphodita/api-reference.php
 #' @export
