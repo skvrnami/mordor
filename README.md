@@ -1,4 +1,4 @@
-# MorphoDiTaR - R client for MorphoDiTa API
+# Mordor - R client for MorphoDiTa API
 
 [![Travis-CI Build Status](https://travis-ci.org/skvrnami/morphoditar.svg?branch=master)](https://travis-ci.org/skvrnami/morphoditar)
 [![codecov](https://codecov.io/gh/skvrnami/morphoditar/branch/master/graph/badge.svg)](https://codecov.io/gh/skvrnami/morphoditar)
@@ -22,13 +22,5 @@ devtools::install_github("skvrnami/morphoditar")
 ## Usage
 
 A basic overview of the package capabilities provides a toy example of Czech (more-or-less) DIY bands which is available [here](http://skvrnami.github.io/morphoditar/lyrics-usecase.html).
-
-### To DO:
-
-- [x] Load tag codes from files (remove hardcoding)
-- [x] Properly recode Tag Var value of dash
-- [ ] Check Slovak model
-- [ ] Handle NA values when tagging (sending to API)
-- [ ] Compatibility with quanteda
 
 
