@@ -33,7 +33,7 @@ test_that("Splitting tags returns data.frame with splitted POS tag", {
 })
 
 test_that("Recoding tags returns data.frame", {
-    expect_equal(ncol(split_tags(a)$output), ncol(a$output))
+    expect_equal(ncol(split_tags(a)$output), ncol(recode_tags(split_tags(a))$output))
 })
 
 context("Test generation")
