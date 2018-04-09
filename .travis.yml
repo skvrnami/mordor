@@ -2,7 +2,8 @@
 sudo: required
 
 language: R
-r_check_args: '--as-cran --no-build-vignettes'
+r_check_args: '--no-build-vignettes'
+r_build_args: '--no-build-vignettes'
 cache: packages
 warnings_are_errors: false
 
