@@ -32,6 +32,10 @@ test_that("Splitting tags returns data.frame with splitted POS tag", {
     expect_equal(ncol(split_tags(b)$output), 17)
 })
 
+test_that("Recoding tags returns data.frame", {
+    expect_equal(ncol(split_tags(a)$output), ncol(a$output))
+})
+
 context("Test generation")
 get_salutation <- function(data){
     gen_morphodita(data) %>%
