@@ -1,7 +1,7 @@
 Package: mordor
 Type: Package
 Title: R interface to MorphoDiTa
-Version: 0.1.0
+Version: 0.2
 Authors@R:
     person("Michael", "Škvrňák", email = "michael.skvrnak@rozhlas.cz", role = c("aut", "cre"))
 Description: R interface to MorphoDiTa used for text analysis.
