@@ -25,6 +25,13 @@ test_that("API tag output returns error when source is wrong", {
     expect_error(tag_morphodita("A je to", source = "špatný"))
 })
 
+a <- tag_morphodita("A je to", source = "docker")
+b <- tag_morphodita("A je to", source = "lindat", tagset = "pdt_to_conll2009")
+test_that("Splitting tags returns data.frame with splitted POS tag", {
+    expect_equal(ncol(split_tags(a)$output), 17)
+    expect_equal(ncol(split_tags(b)$output), 17)
+})
+
 context("Test generation")
 get_salutation <- function(data){
     gen_morphodita(data) %>%
