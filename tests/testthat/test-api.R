@@ -13,12 +13,16 @@ test_that("API tag output (docker)", {
 })
 
 test_that("API tag output (lindat)", {
-    expect_equal(nrow(tag_morphodita("A je to", source = "docker")$output),
+    expect_equal(nrow(tag_morphodita("A je to", source = "lindat")$output),
                  length(unlist(strsplit("A je to", split = " "))))
-    expect_equal(ncol(tag_morphodita("A je to", source = "docker")$output),
+    expect_equal(ncol(tag_morphodita("A je to", source = "lindat")$output),
                  3)
-    expect_equal(colnames(tag_morphodita("A je to", source = "docker")$output),
+    expect_equal(colnames(tag_morphodita("A je to", source = "lindat")$output),
                  c("token", "lemma", "tag"))
+})
+
+test_that("API tag output returns error when source is wrong", {
+    expect_error(tag_morphodita("A je to", source = "špatný"))
 })
 
 context("Test generation")
