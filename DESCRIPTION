@@ -1,4 +1,4 @@
-Package: morphoditar
+Package: mordor
 Type: Package
 Title: R interface to MorphoDiTa
 Version: 0.1.0
@@ -12,7 +12,8 @@ Imports:
     tidyr, 
     car, 
     magrittr, 
-    purrr
+    purrr,
+    rvest
 Suggests:
     devtools,
     testthat, 

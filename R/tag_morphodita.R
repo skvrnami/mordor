@@ -3,37 +3,58 @@
 #'
 #' Function that send to and get requests from MorphoDiTa API call.
 #' @param data Text to be analysed
-#' @param convert_tagset Apply specified tag set converter
+#' @param tagset Apply specified tag set converter
 #' (pdt_to_conll2009 / strip_lemma_comment / strip_lemma_id)
+#' @param source use "docker" or "lindat" for API
 #' @param ... Other parameters accepted by the API (see the API reference)
 #' @seealso http://lindat.mff.cuni.cz/services/morphodita/api-reference.php
 #' @export
-tag_morphodita <- function(data, convert_tagset = "pdt_to_conll2009", ...){
-    tagset <- convert_tagset
-    out <- httr::GET(
-        url = "http://lindat.mff.cuni.cz/services/morphodita/api/tag",
-        query = list(data = data,
-                     output = "json",
-                     convert_tagset = convert_tagset, ...))
+tag_morphodita <- function(data,
+                           tagset = "pdt_to_conll2009",
+                           source = "docker",
+                           ...){
+    if(source == "docker"){
+        out <- httr::GET(url = "http://localhost:4000/",
+                         query = list(text = data))
 
-    if (httr::http_type(out) != "application/json") {
-        stop("API did not return json", call. = FALSE)
+        structure(
+            list(
+                url = out$url,
+                model = "czech-morfflex-pdt-161115",
+                tagset = "none",
+                lang = "cz",
+                output = parse_xml(out$content)
+            ),
+            class = "morphodita_api"
+        )
+    }else if(source == "lindat"){
+        out <- httr::GET(
+            url = "http://lindat.mff.cuni.cz/services/morphodita/api/tag",
+            query = list(data = data,
+                         output = "json",
+                         convert_tagset = tagset))
+
+        if (httr::http_type(out) != "application/json") {
+            stop("API did not return json", call. = FALSE)
+        }
+
+        structure(
+            list(
+                url = out$url,
+                model = jsonlite::fromJSON(
+                    stringr::str_conv(out$content, "UTF-8"))$model,
+                tagset = tagset,
+                lang = substr(jsonlite::fromJSON(
+                    stringr::str_conv(out$content, "UTF-8"))$model, 1, 2),
+                output = do.call(rbind, lapply(jsonlite::fromJSON(
+                    stringr::str_conv(out$content, "UTF-8"))$result,
+                    function(x) x[, !names(x) %in% c("space", "spaces")]))
+            ),
+            class = "morphodita_api"
+        )
+    }else{
+        stop("Unknown source", call. = FALSE)
     }
-
-    structure(
-        list(
-            url = out$url,
-            model = jsonlite::fromJSON(
-                stringr::str_conv(out$content, "UTF-8"))$model,
-            tagset = tagset,
-            lang = substr(jsonlite::fromJSON(
-                stringr::str_conv(out$content, "UTF-8"))$model, 1, 2),
-            output = do.call(rbind, lapply(jsonlite::fromJSON(
-                stringr::str_conv(out$content, "UTF-8"))$result,
-                function(x) x[, !names(x) %in% c("space", "spaces")]))
-        ),
-        class = "morphodita_api"
-    )
 }
 
 
@@ -45,6 +66,27 @@ print.morphodita_api <- function(x, ...){
     cat("Language:", x$lang, "\n\nOutput:\n")
     print(x$output)
     invisible(x)
+}
+
+
+#' Parse XML output from mordor-docker
+#'
+#' @param x output of tagger
+parse_xml <- function(x){
+    out <- suppressWarnings(xml2::read_xml(stringr::str_conv(x, "UTF-8"),
+                              as_html = TRUE))
+    data.frame(
+        token = out %>%
+            rvest::html_nodes("token") %>%
+            rvest::html_text(),
+        lemma = out %>%
+            rvest::html_nodes("token") %>%
+            rvest::html_attr("lemma"),
+        tag = out %>%
+            rvest::html_nodes("token") %>%
+            rvest::html_attr("tag"),
+        stringsAsFactors = FALSE)
+
 }
 
 #' Split the tags into columns
@@ -102,7 +144,7 @@ split_tags <- function(data){
 
         out$tag <- NULL
 
-    }else if (data$tagset %in% c("strip_lemma_id", "strip_lemma_comment") &
+    }else if (data$tagset %in% c("strip_lemma_id", "strip_lemma_comment", "none") &
              data$lang == "cz"){
         out$tag <- unlist(lapply(strsplit(out$tag, split = ""),
                                  function(x) paste0(x, collapse = "|")))

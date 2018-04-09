@@ -71,12 +71,16 @@ Based on this, we can formulate tentative hypotheses like:
 (If you don't care about the programming stuff, scroll down to colourful charts).
 
 ### Processing the data
+First install the necessary packages and pull docker image in which run the
+MorphoDiTa. 
 Let's start with loading the data. They are already stored in the package, 
 so we need to call the `data` function.
 ```{r}
 library(devtools)
-devtools::install_github("skvrnami/morphoditar")
-library(morphoditar)
+devtools::install_github("skvrnami/mordor")
+library(mordor)
+system("docker pull skvrnami/mordor-docker:latest")
+system("docker run -d -p 4000:80 skvrnami/mordor-docker")
 library(dplyr)
 library(ggplot2)
 

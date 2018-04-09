@@ -1,4 +1,4 @@
 library(testthat)
-library(morphoditar)
+library(mordor)
 
-test_check("morphoditar")
+test_check("mordor")
