@@ -16,7 +16,7 @@ For more information see:
 ## Install
 
 ```
-devtools::install_github("skvrnami/morphoditar")
+devtools::install_github("skvrnami/mordor")
 ```
 
 ## Usage
