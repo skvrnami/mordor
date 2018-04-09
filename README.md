@@ -1,7 +1,7 @@
 # Mordor - R client for MorphoDiTa API
 
-[![Travis-CI Build Status](https://travis-ci.org/skvrnami/morphoditar.svg?branch=master)](https://travis-ci.org/skvrnami/morphoditar)
-[![codecov](https://codecov.io/gh/skvrnami/morphoditar/branch/master/graph/badge.svg)](https://codecov.io/gh/skvrnami/morphoditar)
+[![Travis-CI Build Status](https://travis-ci.org/skvrnami/mordor.svg?branch=master)](https://travis-ci.org/skvrnami/mordor)
+[![codecov](https://codecov.io/gh/skvrnami/mordor/branch/master/graph/badge.svg)](https://codecov.io/gh/skvrnami/mordor)
 
 This package serves as a R client for MorphoDiTa API, 
 Morphological Dictionary and Tagger - an open-source 
