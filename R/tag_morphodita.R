@@ -1,3 +1,11 @@
+#' Strip lemma comment
+#' @param out Output of tagging
+#' @export
+strip_lemma_comment <- function(out){
+    out$output$lemma <- stringr::str_remove(out$output$lemma, "-.*|_.*")
+    out
+}
+
 
 #' Perform morphological analysis of supplied text
 #'
@@ -6,18 +14,20 @@
 #' @param tagset Apply specified tag set converter
 #' (pdt_to_conll2009 / strip_lemma_comment / strip_lemma_id)
 #' @param source use "docker" or "lindat" for API
+#' @param strip_comment TRUE if you want to strip the lemma comment
 #' @param ... Other parameters accepted by the API (see the API reference)
 #' @seealso http://lindat.mff.cuni.cz/services/morphodita/api-reference.php
 #' @export
 tag_morphodita <- function(data,
                            tagset = "pdt_to_conll2009",
                            source = "docker",
+                           strip_comment = TRUE,
                            ...){
     if(source == "docker"){
         out <- httr::GET(url = "http://localhost:4000/",
                          query = list(text = data))
 
-        structure(
+        result <- structure(
             list(
                 url = out$url,
                 model = "czech-morfflex-pdt-161115",
@@ -27,6 +37,12 @@ tag_morphodita <- function(data,
             ),
             class = "morphodita_api"
         )
+
+        if(strip_comment){
+            strip_lemma_comment(result)
+        }else{
+            result
+        }
     }else if(source == "lindat"){
         out <- httr::GET(
             url = "http://lindat.mff.cuni.cz/services/morphodita/api/tag",
@@ -38,7 +54,7 @@ tag_morphodita <- function(data,
             stop("API did not return json", call. = FALSE)
         }
 
-        structure(
+        result <- structure(
             list(
                 url = out$url,
                 model = jsonlite::fromJSON(
@@ -52,6 +68,11 @@ tag_morphodita <- function(data,
             ),
             class = "morphodita_api"
         )
+        if(strip_comment){
+            strip_lemma_comment(result)
+        }else{
+            result
+        }
     }else{
         stop("Unknown source", call. = FALSE)
     }
@@ -67,7 +88,6 @@ print.morphodita_api <- function(x, ...){
     print(x$output)
     invisible(x)
 }
-
 
 #' Parse XML output from mordor-docker
 #'
